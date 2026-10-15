@@ -18,8 +18,7 @@ package com.infinity.suite.fragments;
 
 import static android.os.UserHandle.USER_SYSTEM;
 
-import com.infinity.suite.utils.SystemUtils;
-import com.infinity.support.preferences.GlobalSettingListPreference;
+import com.infinity.suite.preferences.SoundPickerPreference;
 import android.app.ActivityManagerNative;
 import android.app.UiModeManager;
 import android.content.Context;
@@ -79,6 +78,8 @@ public class ThemesSettings extends SettingsPreferenceFragment implements OnPref
     private static final String KEY_SYSTEM_ANIMATION_STYLE = "system_animation_style";
     private static final String KEY_VOLUME_DIALOG_TYPE = "volume_dialog_type";
     private static final String KEY_AXION_VOLUME_STYLE = "axion_volume_style";
+    private static final String KEY_LOCK_SOUND = "lock_sound";
+    private static final String KEY_UNLOCK_SOUND = "unlock_sound";
 
     private static final int VOLUME_TYPE_AXION = 0;
     private static final int VOLUME_TYPE_REDESIGNED = 1;
@@ -97,8 +98,8 @@ public class ThemesSettings extends SettingsPreferenceFragment implements OnPref
     private SystemSettingListPreference mAxionVolumeStyle;
     private SystemSettingSwitchPreference mShowVolumePercentage;
 
-    private GlobalSettingListPreference mLockSound;
-    private GlobalSettingListPreference mUnlockSound;
+    private SoundPickerPreference mLockSound;
+    private SoundPickerPreference mUnlockSound;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,14 +108,22 @@ public class ThemesSettings extends SettingsPreferenceFragment implements OnPref
         addPreferencesFromResource(R.xml.infinity_suite_themes);
 
         mContext = getActivity();
-        mLockSound = findPreference("lock_sound");
+        mLockSound = (SoundPickerPreference) findPreference(KEY_LOCK_SOUND);
         if (mLockSound != null) {
-            mLockSound.setOnPreferenceChangeListener(this);
+            mLockSound.entries = getResources().getTextArray(R.array.themes_lock_unlock_sounds_entries);
+            mLockSound.entryValues = getResources().getTextArray(R.array.themes_lock_sounds_values);
+            mLockSound.settingKey = "lock_sound";
+            mLockSound.defaultValue = "/product/media/audio/ui/Lock.ogg";
+            mLockSound.applyConfig();
         }
 
-        mUnlockSound = findPreference("unlock_sound");
+        mUnlockSound = (SoundPickerPreference) findPreference(KEY_UNLOCK_SOUND);
         if (mUnlockSound != null) {
-            mUnlockSound.setOnPreferenceChangeListener(this);
+            mUnlockSound.entries = getResources().getTextArray(R.array.themes_lock_unlock_sounds_entries);
+            mUnlockSound.entryValues = getResources().getTextArray(R.array.themes_unlock_sounds_values);
+            mUnlockSound.settingKey = "unlock_sound";
+            mUnlockSound.defaultValue = "/product/media/audio/ui/Unlock.ogg";
+            mUnlockSound.applyConfig();
         }
 
         final ContentResolver resolver = getActivity().getContentResolver();
@@ -169,12 +178,6 @@ public class ThemesSettings extends SettingsPreferenceFragment implements OnPref
             updateVolumeRelatedVisibility(val);
             return true;
         }
-
-        if (preference == mLockSound || preference == mUnlockSound) {
-            SystemUtils.showSystemUiRestartDialog(getContext());
-            return true;
-        }
-
         return false;
     }
 
