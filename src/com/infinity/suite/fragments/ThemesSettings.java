@@ -18,6 +18,7 @@ package com.infinity.suite.fragments;
 
 import static android.os.UserHandle.USER_SYSTEM;
 
+import com.infinity.suite.utils.SystemUtils;
 import com.infinity.suite.preferences.SoundPickerPreference;
 import android.app.ActivityManagerNative;
 import android.app.UiModeManager;
